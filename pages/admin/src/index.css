@@ -1,0 +1,51 @@
+@import "tailwindcss";
+/*
+ * Upstream shadcn infrastructure (cn-* / base-* architecture):
+ * - `tw-animate-css` supplies the animate-in/out keyframes used by
+ *   overlay components (dropdown, sheet, tooltip).
+ * - `shadcn/tailwind.css` defines the cross-primitive custom variants
+ *   (`data-open:`, `data-closed:`, …) that map both Radix-style
+ *   `data-state="open"` and Base UI `data-open` attributes, plus the
+ *   accordion/collapsible keyframes. Without it those variants are
+ *   unknown to Tailwind v4 and silently generate no CSS.
+ *
+ * The design tokens (@theme inline, :root palette, border-color reset)
+ * now come from @euler/ui-core/theme.css instead of being inlined here.
+ */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@euler/ui-core/theme.css";
+
+/*
+ * Scan the source-distributed @euler packages so Tailwind v4 emits the
+ * utility classes their .tsx sources reference. Without these the packages
+ * render unstyled (Tailwind ignores node_modules by default).
+ */
+@source "../node_modules/@euler/ui-core/src";
+@source "../node_modules/@euler/ui-nova/src";
+@source "../node_modules/@euler/console-kit/src";
+
+/*
+ * Page shell defaults. Kept minimal so antd's cssinjs surface renders
+ * flush against the shadcn Sidebar. Tailwind's preflight already sets
+ * `box-sizing: border-box` and zeroes body margin; the rules below
+ * only add height guarantees.
+ *
+ * Layout-scoped rules now travel with their owners in the packages:
+ *   - console chrome  → @euler/console-kit (ConsoleLayout.css)
+ *   - table cells     → @euler/console-kit (tableLayout.css)
+ */
+html,
+body,
+#root {
+    min-height: 100vh;
+}
+
+body {
+    min-width: 320px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Avenir,
+        Helvetica, Arial, sans-serif;
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

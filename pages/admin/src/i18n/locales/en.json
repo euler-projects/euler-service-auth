@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "iam": "Identity & Access",
+    "user": "Users",
+    "role": "Roles & Permissions",
+    "oauth2": "OAuth2",
+    "oauth2_client": "Clients",
+    "oauth2_jwk": "JWKs",
+    "settings": "Settings"
+  },
+  "header": {
+    "console": "Admin Console",
+    "profile": "Profile",
+    "logout": "Sign out",
+    "logout_confirm": "Are you sure you want to sign out?",
+    "logout_error": "Failed to fetch CSRF token. Please try again.",
+    "language": "Language"
+  },
+  "language": {
+    "zh-Hans": "简体中文",
+    "en": "English"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "more": "More",
+    "loading": "Loading…",
+    "coming_soon": "Coming soon",
+    "back": "Back",
+    "search": "Search",
+    "reset": "Reset",
+    "filters": "Filters",
+    "refresh": "Refresh",
+    "column_settings": "Column Settings",
+    "restore_default": "Restore Default",
+    "edit": "Edit",
+    "edit_with_title": "Edit {{title}}",
+    "delete": "Delete",
+    "detail": "Detail",
+    "save": "Save",
+    "create": "Create",
+    "updated": "Updated",
+    "created": "Created",
+    "deleted": "Deleted",
+    "copy": "Copy",
+    "copied": "Copied",
+    "status": "Status",
+    "actions": "Actions",
+    "type": "Type",
+    "name": "Name",
+    "description": "Description",
+    "close": "Close"
+  },
+  "descriptions": {
+    "expand": "more",
+    "collapse": "less"
+  },
+  "breadcrumb": {
+    "expand": "Expand {{group}} menu"
+  },
+  "shell": {
+    "sidebar_toggle": "Toggle Sidebar",
+    "sidebar_title": "Sidebar",
+    "sidebar_description": "Displays the mobile sidebar."
+  },
+  "oauth2": {
+    "client": {
+      "create": "Create client",
+      "detail": "Details",
+      "rotateSecret": "Rotate secret",
+      "delete": "Delete",
+      "column": {
+        "clientId": "Client ID",
+        "clientName": "Name",
+        "authMethod": "Auth method",
+        "grantTypes": "Grant types",
+        "scopes": "Scopes",
+        "action": "Actions"
+      },
+      "stub": "Action '{{action}}' on {{name}} is not wired yet."
+    }
+  },
+  "user": {
+    "create": "Create user",
+    "detail": "Details",
+    "resetPassword": "Reset password",
+    "enable": "Enable",
+    "disable": "Disable",
+    "delete": "Delete",
+    "column": {
+      "username": "Username",
+      "userId": "User ID",
+      "email": "Email",
+      "phone": "Phone",
+      "authorities": "Authorities",
+      "status": "Status",
+      "action": "Actions"
+    },
+    "status": {
+      "disabled": "Account disabled",
+      "accountExpired": "Account expired",
+      "accountLocked": "Account locked",
+      "credentialsExpired": "Password expired",
+      "normal": "Active"
+    },
+    "role": {
+      "user": "User",
+      "admin": "Administrator"
+    },
+    "modal": {
+      "create": "Create user",
+      "detail": "User details",
+      "resetPassword": "Reset password"
+    },
+    "form": {
+      "username": "Username",
+      "email": "Email",
+      "phone": "Phone number",
+      "password": "Password",
+      "confirm": "Confirm password",
+      "authorities": "Authorities",
+      "authoritiesPlaceholder": "Select user authorities",
+      "required": {
+        "username": "Username is required",
+        "password": "Password is required",
+        "confirm": "Please confirm your password",
+        "phone": "Please input your phone number",
+        "authorities": "Select at least one authority"
+      },
+      "passwordMismatch": "The two passwords do not match"
+    },
+    "confirm": {
+      "enable": "Enable user <code>{{username}}</code>?",
+      "disable": "Disable user <code>{{username}}</code>?",
+      "delete": "Delete user <code>{{username}}</code>?"
+    },
+    "detailPage": {
+      "breadcrumb": "User Detail",
+      "basicInfo": "Basic Information",
+      "identities": "User Identities",
+      "authorities": "User Authorities",
+      "phone": "Phone",
+      "email": "Email",
+      "identityId": "Identity ID",
+      "boundAt": "Bound at",
+      "viewRaw": "View original",
+      "hideRaw": "Hide original",
+      "rawValue": "Original value",
+      "addAuthority": "Add authority",
+      "removeAuthority": "Remove",
+      "confirmDelete": "Confirm delete?",
+      "noIdentities": "No identities",
+      "authorityName": "Authority",
+      "selectAuthority": "Select authority",
+      "google": {
+        "avatar": "Avatar",
+        "name": "Display Name",
+        "email": "Email",
+        "emailVerified": "Verified",
+        "givenName": "Given Name",
+        "familyName": "Family Name"
+      }
+    }
+  }
+}

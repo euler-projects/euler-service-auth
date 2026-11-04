@@ -1,0 +1,226 @@
+server:
+  # Honour X-Forwarded-* headers from the upstream reverse proxy so that
+  # request.isSecure() / scheme reflect the actual TLS-terminated client
+  # connection. Required for HSTS, Secure cookies, and any OAuth2 redirect
+  # construction to behave correctly behind the proxy.
+  forward-headers-strategy: framework
+  # App Attest credentials (e.g. the base64 attestation carried in the
+  # App-Attest-Attestation header) can exceed Tomcat's default 8KB request
+  # header limit, so the header carriage needs a larger budget.
+  max-http-request-header-size: 32KB
+  servlet:
+    session:
+      cookie:
+        # SameSite=Lax keeps the SESSION cookie attached on top-level
+        # navigations (e.g. OAuth2 client -> /oauth2/authorize redirects)
+        # while blocking it on cross-site sub-resource requests. Strict
+        # would break OAuth2 cross-site redirects and is not adopted.
+        same-site: lax
+        # Production is HTTPS-only; the local profile overrides this to
+        # false so that http://localhost can still authenticate.
+        secure: true
+        http-only: true
+
+spring:
+  application:
+    name: user-center
+  web:
+    error:
+      include-stacktrace: always
+      include-message: always
+      include-exception: true
+  datasource:
+    url: jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/${DATABASE_NAME:euler_uc}?characterEncoding=utf8
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:}
+  flyway:
+    baseline-on-migrate: true
+    placeholder-replacement: false
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        timezone:
+          default_storage: NORMALIZE_UTC
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  messages:
+    basename: classpath*:language/**/*
+    use-code-as-default-message: true
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: https://account.eulerproject.org
+        client:
+          default:
+            require-proof-key: true
+            require-authorization-consent: true
+            registration:
+              client-id: default
+              client-authentication-methods:
+                -  none
+              authorization-grant-types:
+                - authorization_code
+              scopes:
+                - openid
+              redirect-uris:
+                - https://example.com/code
+            token:
+              access-token-time-to-live: 7d
+          admin:
+            require-proof-key: true
+            registration:
+              client-id: admin
+              client-secret: '{noop}admin'
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+              redirect-uris:
+                - https://admin.eulerproject.org/auth/callback
+              scopes:
+                - openid
+                - profile
+                - email
+                - phone
+                - authorities
+              post-logout-redirect-uris:
+                - https://admin.eulerproject.org
+            token:
+              access-token-time-to-live: 5m
+              refresh-token-time-to-live: 7d
+              reuse-refresh-tokens: false
+      # Federated login as an OIDC Relying Party (RP). The `google`
+      # registration is intentionally NOT declared here at the framework
+      # level - Spring Boot's OAuth2ClientProperties validate() rejects
+      # empty client-id, so an unset environment would otherwise fail
+      # startup. Deployments that want Google login must add a
+      # profile-specific block, for example:
+      #
+      # spring:
+      #   security:
+      #     oauth2:
+      #       client:
+      #         registration:
+      #           google:
+      #             client-id: ${GOOGLE_CLIENT_ID}
+      #             client-secret: ${GOOGLE_CLIENT_SECRET}
+      #             client-name: Google
+      #             provider: google
+      #             scope: [openid, profile, email]
+      #
+      # Pair it with a matching entry under
+      # `euler.security.web.login-methods.google` (see below) to have it
+      # surface on the /signin page. The redirect URI defaults to
+      # {issuer}/login/oauth2/code/google, which for production resolves
+      # to https://account.eulerproject.org/login/oauth2/code/google.
+
+euler:
+  application:
+    runtime-path: @basedir@/var/run
+    temp-path: @basedir@/var/tmp
+  copyright:
+    holder:
+      website: 'https://www.eulerproject.io'
+      name: 'Euler Projects'
+  web:
+    site:
+      name: 'Euler Projects'
+    page:
+      show-stack-trace: true
+  security:
+    web:
+      enabled: true
+      endpoint:
+        csrf:
+          enabled: true
+        user:
+          login-page: /signin
+          login-processing-url: /doLogin
+          logout-page: /signout
+          logout-processing-url: /doLogout
+        password:
+          enabled: true
+          change-password-page: /change-pw
+          change-password-processing-url: /doChangePw
+        signup:
+          enabled: true
+          signup-page: /create-account
+          signup-processing-url: /doSignup
+        login-methods:
+          discovery:
+            # The entrance SPA fetches GET /login-methods to render the
+            # offered login methods when its shell is statically deployed;
+            # the framework default keeps the discovery endpoint off.
+            enabled: true
+    login-method:
+      password:
+        password:
+          primary: true
+    identity-type:
+      email:
+        jit-provisioning:
+          enabled: true
+          default-authorities:
+            - user
+      # A jwt-bearer assertion carrying no sub opens an anonymous trial account bound to
+      # the app_attest_instance_key identity. The account proves only that a genuine app
+      # generated the key, not who holds the device, which is why this identity may not
+      # share an account with any other. Only a client that authenticated by App Attest may
+      # open one; that restriction is a property of the issuer and is enforced in code, not
+      # configured here.
+      #
+      # This key must equal the issuer's identity type exactly: it is how that issuer's
+      # provisioning policy is looked up, and a key that does not match silently falls back
+      # to the default policy instead of failing.
+      app_attest_instance_key:
+        jit-provisioning:
+          enabled: true
+          default-authorities:
+            - user
+    authentication:
+      otp:
+        enabled: true
+        storage: redis
+        issue-endpoint-uri: /otp/tickets
+    oauth2:
+      authorizationserver:
+        authorization-store-type: redis
+        redis-key-prefix: 'euler:oauth2:auth'
+        dynamic-client-registration:
+          enabled: true
+      resourceserver:
+        url-patterns:
+          - /api/**
+        session-aware: true
+
+# ---- OTP delivery gateways ----
+# Each channel activates only when its api-key is present; the keys below are
+# commented out so both channels stay disabled by default. Enable one by
+# providing the api-key via a profile override, e.g. in application-local.yml:
+#     yunpian:
+#       api-key: ${YUNPIAN_APIKEY}
+
+yunpian:
+  # api-key: ${YUNPIAN_APIKEY}
+  # api-url: https://sms.yunpian.com/v2/sms/single_send.json
+  templates:
+    # Required fallback template; used when purpose is missing or unmatched.
+    default: ${YUNPIAN_DEFAULT_TEMPLATE}
+
+sendgrid:
+  # api-key: ${SENDGRID_APIKEY}
+  # api-url: https://api.sendgrid.com/v3/mail/send
+  from:
+    email: ${SENDGRID_SENDER_EMAIL:no-reply@eulerproject.org}
+    name: ${SENDGRID_SENDER_NAME:Euler Projects}
+  templates:
+    # Required fallback dynamic template id; used when purpose is missing or unmatched.
+    default: ${SENDGRID_DEFAULT_TEMPLATE}

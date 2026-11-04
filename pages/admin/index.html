@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="site-name" th:content="${euler.ctx.__SITE_NAME}" content="User Center"/>
+    <meta name="logout-processing-url" th:content="${logoutProcessingUrl}" content="/logout"/>
+    <title th:text="${euler.ctx.__SITE_NAME}">Vite + React</title>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

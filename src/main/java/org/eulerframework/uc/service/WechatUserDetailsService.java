@@ -1,0 +1,69 @@
+package org.eulerframework.uc.service;
+
+import org.eulerframework.common.util.StringUtils;
+import org.eulerframework.security.authentication.wechat.WechatUser;
+import org.eulerframework.security.core.userdetails.EulerUserDetails;
+import org.eulerframework.security.core.userdetails.EulerWechatUserDetailsService;
+import org.eulerframework.security.core.userdetails.RandomUsernameGenerator;
+import org.eulerframework.security.core.userdetails.UserDetailsNotFoundException;
+import org.eulerframework.security.util.UserDetailsUtils;
+import org.eulerframework.uc.entity.WechatUserMappingEntity;
+import org.eulerframework.uc.model.User;
+import org.eulerframework.uc.repository.WechatUserMappingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class WechatUserDetailsService implements EulerWechatUserDetailsService {
+
+    private WechatUserMappingRepository wechatUserMappingRepository;
+
+    private UserService userService;
+
+    @Override
+    public EulerUserDetails loadUserByWechatUser(WechatUser wechatUser) {
+        return this.wechatUserMappingRepository.findByOpenId(wechatUser.getOpenId())
+                .map(WechatUserMappingEntity::getUserId)
+                .map(userId -> this.userService.loadUserById(userId))
+                .map(UserDetailsUtils::toEulerUserDetails)
+                .orElseThrow(() -> new UserDetailsNotFoundException(wechatUser.getOpenId()));
+    }
+
+    @Override
+    public EulerUserDetails createUser(WechatUser wechatUser, List<String> authorities) {
+        WechatUserMappingEntity wechatUserMappingEntity = new WechatUserMappingEntity();
+        wechatUserMappingEntity.setOpenId(wechatUser.getOpenId());
+        wechatUserMappingEntity.setUnionId(wechatUser.getUnionId());
+        wechatUserMappingEntity.setNickName(wechatUser.getNickName());
+        wechatUserMappingEntity.setGender(wechatUser.getGender());
+        wechatUserMappingEntity.setCity(wechatUser.getCity());
+        wechatUserMappingEntity.setProvince(wechatUser.getProvince());
+        wechatUserMappingEntity.setCountry(wechatUser.getCountry());
+        wechatUserMappingEntity.setAvatarUrl(wechatUser.getAvatarUrl());
+
+        EulerUserDetails userDetails = EulerUserDetails.builder()
+                .username(RandomUsernameGenerator.generate())
+                .password("{noop}" + StringUtils.randomString(32))
+                .authorities(authorities.toArray(new String[0]))
+                .build();
+        User userCreation = new User();
+        userCreation.reloadUserDetails(userDetails);
+        User createdUser = this.userService.createUser(userCreation);
+
+        wechatUserMappingEntity.setUserId(createdUser.getUserId());
+        this.wechatUserMappingRepository.save(wechatUserMappingEntity);
+        return UserDetailsUtils.toEulerUserDetails(createdUser);
+    }
+
+    @Autowired
+    public void setWechatUserMappingRepository(WechatUserMappingRepository wechatUserMappingRepository) {
+        this.wechatUserMappingRepository = wechatUserMappingRepository;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+}

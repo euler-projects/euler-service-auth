@@ -1,0 +1,102 @@
+@import "tailwindcss";
+/*
+ * Upstream shadcn infrastructure (cn-* / base-* architecture):
+ * - `tw-animate-css` supplies the animate-in/out keyframes used by
+ *   overlay components (dropdown, sheet, tooltip).
+ * - `shadcn/tailwind.css` defines the cross-primitive custom variants
+ *   (`data-open:`, `data-closed:`, …) that map both Radix-style
+ *   `data-state="open"` and Base UI `data-open` attributes, plus the
+ *   accordion/collapsible keyframes. Without it those variants are
+ *   unknown to Tailwind v4 and silently generate no CSS.
+ *
+ * Design tokens now come from the @euler packages instead of being inlined:
+ *   @euler/ui-core/theme.css      → shared neutral tokens (light) + border reset
+ *   @euler/ui-luma/theme-luma.css → base-luma additions (Inter type scale, chart palette)
+ */
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+@import "@euler/ui-core/theme.css";
+@import "@euler/ui-luma/theme-luma.css";
+
+/*
+ * Scan the source-distributed @euler packages so Tailwind v4 emits the
+ * utility classes their .tsx sources reference. Without these the packages
+ * render unstyled (Tailwind ignores node_modules by default).
+ */
+@source "../node_modules/@euler/ui-core/src";
+@source "../node_modules/@euler/ui-luma/src";
+
+/*
+ * Tailwind v4 flipped the default `border-color` from `gray-200` to
+ * `currentColor`. Restore the shadcn convention of defaulting borders
+ * to the theme's `--border` token so bare `border` utilities don't
+ * inherit the near-black text color. The `@apply` rules below are
+ * entrance-specific base defaults (border/outline, page colors, and the
+ * Inter `font-sans` type scale from the base-luma tokens).
+ */
+@layer base {
+    *,
+    ::before,
+    ::after {
+        border-color: var(--border);
+    }
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+html,
+body,
+#root {
+    min-height: 100vh;
+}
+
+body {
+    min-width: 320px;
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+/*
+ ---break---
+ */
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
