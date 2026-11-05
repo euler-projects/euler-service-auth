@@ -17,14 +17,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-    // Keep React a single instance across the app and the source-distributed
-    // @euler packages (they peer-depend on react/react-dom).
-    dedupe: ['react', 'react-dom'],
-  },
-  // The @euler packages ship raw TSX (no dist); exclude them from esbuild dep
-  // pre-bundling so their JSX goes through @vitejs/plugin-react.
-  optimizeDeps: {
-    exclude: ['@euler/ui-core', '@euler/ui-nova', '@euler/console-kit'],
   },
   server: {
     port: 5173,

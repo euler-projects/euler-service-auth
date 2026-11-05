@@ -1,29 +1,45 @@
 @import "tailwindcss";
-/*
- * Upstream shadcn infrastructure (cn-* / base-* architecture):
- * - `tw-animate-css` supplies the animate-in/out keyframes used by
- *   overlay components (dropdown, sheet, tooltip).
- * - `shadcn/tailwind.css` defines the cross-primitive custom variants
- *   (`data-open:`, `data-closed:`, …) that map both Radix-style
- *   `data-state="open"` and Base UI `data-open` attributes, plus the
- *   accordion/collapsible keyframes. Without it those variants are
- *   unknown to Tailwind v4 and silently generate no CSS.
- *
- * The design tokens (@theme inline, :root palette, border-color reset)
- * now come from @euler/ui-core/theme.css instead of being inlined here.
- */
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@euler/ui-core/theme.css";
+/* 应用自己的 Tailwind 类映射到公开主题变量，不扫描或编译组件库。 */
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
 
-/*
- * Scan the source-distributed @euler packages so Tailwind v4 emits the
- * utility classes their .tsx sources reference. Without these the packages
- * render unstyled (Tailwind ignores node_modules by default).
- */
-@source "../node_modules/@euler/ui-core/src";
-@source "../node_modules/@euler/ui-nova/src";
-@source "../node_modules/@euler/console-kit/src";
+
+
+
 
 /*
  * Page shell defaults. Kept minimal so antd's cssinjs surface renders
