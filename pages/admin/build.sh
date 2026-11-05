@@ -6,6 +6,8 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 res="$here/../../src/main/resources"
 
+cd "$here"
+npm ci
 npm run build
 
 # Clear only what THIS app owns, never the whole static root: the
